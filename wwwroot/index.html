@@ -1,22 +1,31 @@
 
-<html> 
-		<body> 
-				<h1>it lishuai's http</h1>
+<html>
+    <head>
 
+			<meta charset="UTF-8">
+	</head>		
+		<body background="./images/index.jpg"> 
+			  			
+				<hr/>	<h1 style="color:red;font-size:50px;text-align:center">欢迎光临</h1>  </hr>
 
-				<form action="/cgi/Netcal" method="POST">
-				First data:<br>
-				<input type="text" name="firsdata" value="100">
+				<center>
+				<form action="/cgi/insertData" method="GET">
+				姓名:<br>
+				<input type="text" name="name" value="100">
 				<br>
-				Second data:<br>
-				<input type="text" name="seconddata" value="200">
-				<br><br>
-				<input type="submit"value="Submit">
-		</form> 
-				
-				<p>
-				<img src="/images/index.jpeg" alt="Big pig" width="500" height="500">
-				</p> 
+				性别:<br>
+				<input type="text" name="sex" value="200">
+				<br>
+				电话:<br><input type="text" name="phone" value="200" align="center">
+				<br>
+				<br>
+				<input type="submit"value="submit">
+		</form>
+		</center>
+		<br/>
+		<center><a href="http://192.168.43.216:9526/cgi/selectData">查询</a></center>
+		<br/>	
+				<!--img src="/images/index.jpg" alt="load picture fail" width="500" height="500"-->
 		</body> 
 </html>
 

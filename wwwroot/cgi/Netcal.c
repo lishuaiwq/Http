@@ -13,8 +13,7 @@ void mycal(char *buf)
    //printf("%d\n",x);  
  // printf("%d\n",y);  
   printf("<html>\n");		   
-   printf("<body>\n");
-   printf("<h3>%d+%d=%d</h3>",x,y,x+y);   
+   printf("<body>\n");  
    printf("<h3>%d-%d=%d</h3>",x,y,x-y);   
    printf("<h3>%d*%d=%d</h3>",x,y,x*y);   
    printf("<h3>%d/%d=%d</h3>",x,y,x/y);   

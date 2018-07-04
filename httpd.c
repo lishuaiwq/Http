@@ -13,6 +13,7 @@
 //#define Debug
 #define MAX  1024 
 #define HOME_PAGE "index.html"
+int sum=1;
 int startup(int port)//用来获取一个监听套接字
 {
    int sock=socket(AF_INET,SOCK_STREAM,0);
@@ -108,7 +109,7 @@ void echo_www(int sock,char *path,int size,int *err)//调用这个函数绝对�
 {
       //在这里我们需要把缓冲区中的东西清理完，因为之前我们只是读取了头部一行而已，
      clear_headr(sock); 	  
-    int fd=open(path,O_RDONLY);//打开请求的文件
+    int fd=open(path,O_RDONLY);//打开请求的文件,将读取的二进制文件给其写回去
 	if(fd<0)
 	{
 	  perror("open index.html"); 
@@ -119,12 +120,12 @@ void echo_www(int sock,char *path,int size,int *err)//调用这个函数绝对�
 	sprintf(line,"HTTP/1.0 200 OK\r\n");
 	printf("line %s",line); 
     send(sock,line,strlen(line),0);//把状态行发送回去 
-//   sprintf(line,"Content-Type: text/html\r\ncharset:UTF-8\r\n");
+ //sprintf(line,"Content-Type: text/html\r\ncharset:UTF-8\r\n");
   // send(sock,line,strlen(line),0);//把状态行发送回去 
     sprintf(line,"\r\n"); 
 	send(sock,line,strlen(line),0); 
 	printf("line=%s",line); 
-	sendfile(sock,fd,NULL,size);//两个文件之间直接拷贝不需要进过缓冲区
+	sendfile(sock,fd,NULL,size);//两个文件之间直接拷贝不需要进过缓冲区,直接将文件拷贝过去
 	printf("sock=%d fd=%d size=%d",sock,fd,size); 
 	close(fd); 
 } 
@@ -247,7 +248,7 @@ int exe_cgi(int sock,char *path,char method[],char* query_string)//要么是
 	 } 
     return 200;
 } 
-static void* handler_request(void* arg)//处理请求的函数
+static void* handler_request(void* arg)//处理请求的函数，线程函数
 {
     int sock=(int)arg;
 	char line[MAX]; //读取的求情报文的一行
@@ -281,15 +282,15 @@ static void* handler_request(void* arg)//处理请求的函数
 	   i++;
 	   j++;
    } 
-   method[i]='\0';
+   method[i]='\0';//得到了其中的方法
    //得到方法以后要判断我们的是什么方法,同时注意需要处理方法的大小写问题，因为大小写都一样
    //所以我们用strcasecmp()这个函数可以忽略比较的字符串的大小写
    if(strcasecmp(method,"GET")==0)
    {
- printf("这是get方法\n")  ;//是get就什么都不做 
+        printf("这是get方法\n")  ;//是get就什么都不做 
    }else if(strcasecmp(method,"POST")==0)//post方法假定一定有数据，有数据就一定要用cgi
    {
-       cgi=1;  
+       cgi=1; //只要有数据过来就调用cgi 
    } 
    else
    {
@@ -344,8 +345,8 @@ static void* handler_request(void* arg)//处理请求的函数
   }
   printf("  method=%s  path:%s\n",method,path); 
   //判断请求的资源是否存在,请求的资源即文件在path中
-    printf("cgi=%d\n",cgi); 
-	printf("aaaaa\n"); 
+  //  printf("cgi=%d\n",cgi); 
+//	printf("aaaaa\n"); 
   struct stat st;
 if(stat(path,&st)<0)
 {
@@ -356,22 +357,21 @@ if(stat(path,&st)<0)
 }
 else//找到对应的文件了，在这里有可能你访问的文件是一个可执行文件,这样的话就要用cgi的方式
 {
-	printf("cgi=%d   找到对应的文件\n",cgi); 
 
+	printf("cgi=%d   找到对应的文件\n",cgi); 
 	if(S_ISDIR(st.st_mode))//如果是个目录，则返回目录下面的默认页面
 	{
 	      strcat(path,HOME_PAGE); 
 	} 
 	else//如果不是目录 
 	{
-	
 			//判断是否为可执行文件
 			if((st.st_mode&S_IXUSR)||(st.st_mode&S_IXGRP)||(st.st_mode&S_IXOTH))
 			 {
 			    cgi=1;
 			 } 
 	} 
-	printf("last cgi=%d\n"); 
+//	printf("last cgi=%d\n"); 
 	if(cgi)//证明有数据或者是可执行的文件
     {
 		printf("cgi调用了\n"); 	
@@ -379,7 +379,7 @@ else//找到对应的文件了，在这里有可能你访问的文件是一个�
 	}
 	else//不是cgi,是get方法没有参数
 	{
-			printf("正常页面显示被调用了\n"); 
+	 printf("正常页面显示被调用了\n"); 
 	 echo_www(sock,path,st.st_size,&errCode);//返回我们的信息就行了 
 	} 
 } 
@@ -403,7 +403,7 @@ int main(int argc,char* argv[])
 
 
     printf("listenfd=%d\n",listen_fd); 
-	for(;;)
+	for(;;)//循环建立连接
 	{
 	   struct sockaddr_in client;
        socklen_t len=sizeof(client); 
@@ -412,7 +412,8 @@ int main(int argc,char* argv[])
        {
 	      perror("use aeecpt");
 		   continue;//继续获取链接
-	   } 
+	   }
+	   printf("第%d次接收浏览器请求\n",sum++); 
 	   pthread_t id;
 	   pthread_create(&id,NULL,handler_request,(void*)newfd);//处理请求
 	   pthread_detach(id);//线程分离 
