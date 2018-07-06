@@ -23,7 +23,7 @@ printf("</head><body background=\"../images/index.jpg\">\n");
 	  return;
    } 
    char sql[1024];
-   sprintf(sql,"SELECT *FROM student_info");
+   sprintf(sql,"SELECT *FROM user_data");
     mysql_query(mysql_fd,sql); //使用mysql这个语句
    MYSQL_RES *res=mysql_store_result(mysql_fd);
    int row=mysql_num_rows(res);//获取行数
@@ -53,7 +53,8 @@ printf("</head><body background=\"../images/index.jpg\">\n");
 		printf("\n"); 
 		printf("</tr>\n"); 
    }
-   printf("</table>\n"); 
+   printf("</table>\n");
+  printf( "<a href=\"#\" onClick=\"javascript :history.back(-1);\">返回上一页</a>");
 printf("</body></html>"); 
 
 	mysql_close(mysql_fd); 

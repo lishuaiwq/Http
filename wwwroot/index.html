@@ -1,31 +1,30 @@
 
-<html>
+<html lang="en">
     <head>
 
-			<meta charset="UTF-8">
+			<meta charset="utf-8">
 	</head>		
 		<body background="./images/index.jpg"> 
 			  			
 				<hr/>	<h1 style="color:red;font-size:50px;text-align:center">欢迎光临</h1>  </hr>
-
-				<center>
-				<form action="/cgi/insertData" method="GET">
+						<center>		
+				<form action="/cgi/insertData" method="POST" charset="utf-8">
 				姓名:<br>
-				<input type="text" name="name" value="100">
+				<input type="text" name="name" value="NULL">
 				<br>
 				性别:<br>
-				<input type="text" name="sex" value="200">
+				<input type="text" name="sex" value="NULL">
 				<br>
-				电话:<br><input type="text" name="phone" value="200" align="center">
+				密码:<br><input type="text" name="passwd" value="NULL" align="center">
 				<br>
 				<br>
-				<input type="submit"value="submit">
+				<input type="submit"value="注册">
 		</form>
-		</center>
+	   </center>
 		<br/>
-		<center><a href="http://192.168.43.216:9526/cgi/selectData">查询</a></center>
+		<center><a href="./load.html">登录</a></center>
+		<a href=""sms:15229073878?body=000000"">给 10086 发短信</a>
 		<br/>	
-				<!--img src="/images/index.jpg" alt="load picture fail" width="500" height="500"-->
 		</body> 
 </html>
 

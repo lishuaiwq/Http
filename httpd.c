@@ -76,14 +76,12 @@ int get_line(int sock,char line[],int n)//按行获取，将获取的内如放�
 						} 
 						else//下一个读取的就是'\n'
 						{
-						   recv(sock,&c,1,0);//如果是'\n'直接读取'\n' ，相当于将c='\n'了   
+			  recv(sock,&c,1,0);//如果是'\n'直接读取'\n' ，相当于将c='\n'了   
 						} 
 					} 
 				} 
-				//不等于'\r',读取到正常字符, 
-				
-				   line[i++]=c; //如果读取到的是'\n'，则将'\n'放进去以后推出循环  
-			   
+				//不等于'\r',读取到正常字符, 	
+				   line[i++]=c; //如果读取到的是'\n'，则将'\n'放进去以后推出循环   
 			} 
 			else
 			{
@@ -101,9 +99,8 @@ void clear_headr(int sock)//清理缓冲区剩余内容的函数
    do
    {
        get_line(sock,line,sizeof(line));
-//	printf("%s",line);//打印读取的行的内容 
+	//printf("%s",line);//打印读取的行的内容 
    }while(strcmp(line,"\n")!=0);//最后读取到的line的内容是\n就证明我们读取完了整个报文  
-
 } 
 void echo_www(int sock,char *path,int size,int *err)//调用这个函数绝对是返回一个网页文件
 {
@@ -120,19 +117,44 @@ void echo_www(int sock,char *path,int size,int *err)//调用这个函数绝对�
 	sprintf(line,"HTTP/1.0 200 OK\r\n");
 	printf("line %s",line); 
     send(sock,line,strlen(line),0);//把状态行发送回去 
- //sprintf(line,"Content-Type: text/html\r\ncharset:UTF-8\r\n");
-  // send(sock,line,strlen(line),0);//把状态行发送回去 
+ //sprintf(line,"charset:UTF-8\r\n");
+  //send(sock,line,strlen(line),0);//把状态行发送回去 
     sprintf(line,"\r\n"); 
 	send(sock,line,strlen(line),0); 
 	printf("line=%s",line); 
 	sendfile(sock,fd,NULL,size);//两个文件之间直接拷贝不需要进过缓冲区,直接将文件拷贝过去
 	printf("sock=%d fd=%d size=%d",sock,fd,size); 
 	close(fd); 
-} 
-void echo_error(int code)
+}
+void erridnex(int sock,char *path,int size) 
 {
+     clear_headr(sock); 	  
+    int fd=open(path,O_RDONLY);//打开请求的文件,将读取的二进制文件给其写回去
+	char line[MAX];
+	sprintf(line,"HTTP/1.0 200 OK\r\n");
+	printf("line %s",line); 
+    send(sock,line,strlen(line),0);//把状态行发送回去 
+ //sprintf(line,"charset:UTF-8\r\n");
+  //send(sock,line,strlen(line),0);//把状态行发送回去 
+    sprintf(line,"\r\n"); 
+	send(sock,line,strlen(line),0); 
+	printf("line=%s",line); 
+	sendfile(sock,fd,NULL,size);//两个文件之间直接拷贝不需要进过缓冲区,直接将文件拷贝过去
+	printf("sock=%d fd=%d size=%d",sock,fd,size); 
+	close(fd);
+} 
+void echo_error(int sock,int code)
+{
+	//	exit(0); 
+         struct stat st;
     switch(code){
 	   case 404:
+         if(stat("./wwwroot/err.html",&st)<0)
+		 {
+				printf("dakaishibai"); 
+		        exit(0); 
+		 } 
+	     erridnex(sock,"./wwwroot/err.html",st.st_size);  
 			   break;
 	   case 501:
 			   break;
@@ -140,10 +162,8 @@ void echo_error(int code)
 			   break;
 	}  
 } 
-int exe_cgi(int sock,char *path,char method[],char* query_string)//要么是
-		                                                          //post方法要么是带参数的get 方法
+int exe_cgi(int sock,char *path,char method[],char* query_string)//要么是                                                  //post方法要么是带参数的get 方法
 {
-
 		char line[MAX]; 
 		int content_length=-1;
 
@@ -388,7 +408,7 @@ else//找到对应的文件了，在这里有可能你访问的文件是一个�
 
 end:
    if(errCode!=200)
-		echo_error(errCode); 
+		echo_error(sock,errCode); 
    close(sock); 
 } 
 int main(int argc,char* argv[])
